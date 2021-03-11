@@ -8,12 +8,27 @@ function Home() {
         transmodeCode: "TRM",
         reportCode: "TKLIP",
         fromFundsCode: "REK",
-        toFundsCode: "REK",
+        toFundsCode: "UE",
         personalAccountType: "TPE",
         trsToCountry: "ID",
         fromAccSwift: "CENAIDJAXXX",
+        fromAccAccount: "0703074003",
+        fromAccInstitutionName: "PT. Sinar Digital Terdepan",
         rentityId: 3846,
-        rentityBranch: "PT Rpay Finansial Digital Indonesia"
+        rentityBranch: "PT Rpay Finansial Digital Indonesia",
+        rowData: undefined,
+        rowDataCount:0
+    })
+
+    const [user, setUser] = useState({
+        nama_lengkap: "Nesya Zahary",
+        tanggal_lahir: "1993-01-25T00:00:00",
+        nik: "3171076501930001",
+        kewarganegaraan: "ID",
+        email: "nezsya.rpay@gmail.com",
+        pekerjaan: "Staff Legal &#38; Compliance",
+        jenis_kelamin: "F",
+        title: "Sarjana Hukum"
     })
 
     // const [transmodeCode, setTransmodeCode] = useState("TRM")
@@ -30,6 +45,7 @@ function Home() {
 
     const checkExcel = async () => {
         const { reportCode, rentityId, rentityBranch } = reportingData
+        const { nama_lengkap, tanggal_lahir, nik, kewarganegaraan, jenis_kelamin, email, pekerjaan, title } = user
         const workbook = new ExcelJs.Workbook();
         const result = await workbook.xlsx.load(data.excelFile)
 
@@ -38,7 +54,9 @@ function Home() {
         let transaction = []
         let dataTosend = {}
         let sheetName = result._worksheets[1].name
-        // console.log(sheetName)
+        let totalRow = result._worksheets[1]._rows.length - 3
+        // console.log(result._worksheets[1]._rows.length)
+        console.log(result)
 
         // reporting person
         dataTosend.report = {}
@@ -51,12 +69,17 @@ function Home() {
         dataTosend.report.submission_date = today()
         dataTosend.report.currency_code_local = "IDR"
         dataTosend.report.reporting_person = {}
-        dataTosend.report.reporting_person.gender = "F"
-        dataTosend.report.reporting_person.title = ""
+        dataTosend.report.reporting_person.gender = jenis_kelamin
+        dataTosend.report.reporting_person.title = title
         dataTosend.report.reporting_person.first_name = ""
         dataTosend.report.reporting_person.middle_name = ""
-        dataTosend.report.reporting_person.last_name = "Agnes F Triliana"
+        dataTosend.report.reporting_person.last_name = nama_lengkap
+        dataTosend.report.reporting_person.birthdate = tanggal_lahir
         dataTosend.report.reporting_person.mothers_name = ""
+        dataTosend.report.reporting_person.ssn = nik
+        dataTosend.report.reporting_person.nationality1 = kewarganegaraan
+        dataTosend.report.reporting_person.email = email
+        dataTosend.report.reporting_person.occupation = pekerjaan
         dataTosend.report.location = {}
         dataTosend.report.location.address_type = "K"
         dataTosend.report.location.address = "Gedung Capitol lt 7, Jl. Prapatan No. 14-16SA"
@@ -69,7 +92,7 @@ function Home() {
 
         let ws = result.getWorksheet(sheetName)
         ws.eachRow({includeEmpty: true}, function (row, rowNumber) {
-            console.log(row.values)
+            // console.log(row.values)
             if (rowNumber > 3) {
                 // console.log(`Row ${rowNumber} = ${row.values}`)
                 // transactionsToXML(row.values)
@@ -136,7 +159,10 @@ function Home() {
                 // report.push(dataToSend)
                 // dataToSend = {}
                 transaction.push(transactionsToXML(row.values))
-                dataTosend.report.transaction = transaction
+                setReportingData({
+                    ...reportingData, rowDataCount: ++reportingData.rowDataCount
+                })
+                // dataTosend.report.transaction = transaction
                 // dataTosend.report = {}
                 // dataTosend.report.transactions = {}
                 // dataTosend.report.transactions.transaction = transaction
@@ -147,26 +173,52 @@ function Home() {
             }
             // console.log(`Row ${rowNumber} = ${JSON.stringify(row.values)}`)
             // row.values.forEach((val, index) => {
-            //     console.log(val)
-            // })
-            // for (let index = 3; index < row.values.length; index++) {
-            //     console.log(row.values[index])
-            //     // const element = array[index];
-            // }
+                //     console.log(val)
+                // })
+                // for (let index = 3; index < row.values.length; index++) {
+                    //     console.log(row.values[index])
+                    //     // const element = array[index];
+                    // }
+        })
+        dataTosend.report.transaction = transaction
+        setReportingData({
+            ...reportingData, rowData: totalRow
         })
         // setJsonBlob(report)
         setJsonBlob(JSON.stringify(dataTosend,undefined, 4))
+        // console.log(reportingData)
+    }
+
+    const today = ( code = "" ) => {
+        // let year = new Date().getFullYear()
+        // let month = new Date().getMonth()
+        // let day = new Date().getDate()
+        // let hours = new Date().getHours()
+        // let min = new Date().getMinutes()
+        // let sec = new Date().getSeconds()
+
+        if (code === "ref") {
+            let todayDate = new Date().toISOString().substr(0, 19)
+            return todayDate.replace(/-|T|:/gi, "")
+        }
+        
+        return new Date().toISOString().substr(0, 19)
     }
 
     const downloadButton = () => {
         // let downnload = JSON.stringify(jsonBlob, undefined, 4)
         let downnload = jsonBlob
+        // console.log(reportingData.rowDataCount)
+        // console.log(reportingData.rowData === reportingData.rowDataCount)
 
-        filedownload(downnload, `${today("ref")}-my-json-file.json`)
+        filedownload(downnload, `${today("ref")}-wallet_to_bank-nonID.json`)
         setData({
             ...data, excelFile:undefined, excelFileName:"choose file"
         })
         setJsonBlob([])
+        setReportingData({
+            ...reportingData, rowDataCount: 0, rowData: undefined
+        })
     }
 
     const onInputExcel = (e) => {
@@ -181,7 +233,7 @@ function Home() {
     }
 
     const transactionsToXML = (data) => {
-        const { fromFundsCode, toFundsCode, transmodeCode, trsToCountry, fromAccSwift } = reportingData
+        const { fromFundsCode, toFundsCode, transmodeCode, trsToCountry, fromAccSwift, fromAccAccount, fromAccInstitutionName } = reportingData
         let obj = {}
 
         obj = {}
@@ -199,7 +251,10 @@ function Home() {
         obj.t_from.from_account.swift = fromAccSwift
         obj.t_from.from_account.non_bank_institution = 1
         obj.t_from.from_account.branch = "-"
-        obj.t_from.from_account.account = data[9]
+        obj.t_from.from_account.account = fromAccAccount
+        obj.t_from.from_account.signatory = {}
+        obj.t_from.from_account.signatory.t_person = {}
+        obj.t_from.from_account.signatory.t_person.last_name = fromAccInstitutionName
         obj.t_from.from_country = data[21]
         obj.t_to = {}
         obj.t_to.to_funds_code = toFundsCode
@@ -231,33 +286,48 @@ function Home() {
         return date
     }
 
-    const today = ( code = "" ) => {
-        // let year = new Date().getFullYear()
-        // let month = new Date().getMonth()
-        // let day = new Date().getDate()
-        // let hours = new Date().getHours()
-        // let min = new Date().getMinutes()
-        // let sec = new Date().getSeconds()
-
-        if (code === "ref") {
-            let todayDate = new Date().toISOString().substr(0, 19)
-            return todayDate.replace(/-|T|:/gi, "")
-        }
-        
-        return new Date().toISOString().substr(0, 19)
-    }
-
     return(
         <div>
-            <input type="file" onChange={(e) => onInputExcel(e)}/>
+            <div className='d-flex justify-content-center align-items-center' style={{height:'90vh'}}>
+                <div className='d-flex justify-content-center align-items-center' style={{flexDirection:"column", width:'30%', border:'2px solid #281e5a', borderRadius:'10px', height:'500px'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'flex-end', alignItems: 'center'}}>
+                        <h3 className="h3 text-center mb-4" style={{lineHeight:0, color:'#281e5a'}}>Please input excel file</h3>
+                        <div className="grey-text" style={{marginTop: '10px', marginBottom: '10px'}} >
+                            <div className="custom-file">
+                                <input
+                                    type="file"
+                                    className="custom-file-input"
+                                    id="inputExcelFile"
+                                    // aria-describedby="inputGroupFileAddon01"
+                                    onChange={(e) => onInputExcel(e)}
+                                />
+                                <label className="custom-file-label" htmlFor="inputExcelFile">
+                                    { data.excelFileName }
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                        <div className="button5" style={{backgroundColor:"#281e5a", cursor:'pointer', borderRadius: '10px', marginBottom: '10px', marginTop: '10px' }} onClick={checkExcel}>Cek excel</div>
+                        <div style={{width:'100%', textAlign: 'center', marginBottom: '10px', marginTop: '10px', maxHeight:'300px'}}>
+                            {
+                                reportingData.rowData === reportingData.rowDataCount ?
+                                <button className="btn downloadButton" style={{minWidth: 'max-content', border:'1px solid #281e5a', color: '#281e5a', marginBottom: '10px', marginTop: '10px' }} onClick={downloadButton}>Download</button>
+                                :
+                                null
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* <input className="custom-file-input" type="file" onChange={(e) => onInputExcel(e)}/>
             <button onClick={checkExcel}>Cek excel</button>
             {
-                jsonBlob.length ?
+                reportingData.rowData === reportingData.rowDataCount ?
                 <button onClick={downloadButton}>Download</button>
                 :
                 null
-            }
-            Ini Home
+            } */}
         </div>
     )
 }

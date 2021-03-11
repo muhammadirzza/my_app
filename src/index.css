@@ -64,7 +64,7 @@ div.button5:hover{
 }
 
 .btn:hover{
-  color: #FFF;
+  color: #FFFFFF !important;
 }
 
 .btn::before{
@@ -74,7 +74,7 @@ div.button5:hover{
   position: absolute;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: #281e5a;
   z-index: -1;
   transform-origin: 0 0;
   transition: transform 0.5s;
