@@ -62,7 +62,7 @@ function Home() {
         "Status",
         "Message",
         "Destination Bank",
-        "KODE SWIFT",
+        "SWIFT CODE",
         "Destination Bank Account",
         "Destination Person",
         "From Country"
