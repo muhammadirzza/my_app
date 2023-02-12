@@ -9,8 +9,9 @@ function Home() {
         transmodeCode: "TRM",
         reportCode: "TKLIP",
         fromFundsCode: "REK",
-        // toFundsCode: "UE",
-        toFundsCode: "REK",
+        toFundsCode: "UE",
+        // toFundsCode: "TRVEN",
+        // toFundsCode: "REK",
         personalAccountType: "TPE",
         trsToCountry: "ID",
         fromAccSwift: "CENAIDJAXXX",
@@ -23,14 +24,14 @@ function Home() {
         workSheetName: ""
     })
     const user = {
-        nama_lengkap: "Nesya Zahary",
-        tanggal_lahir: "1993-01-25T00:00:00",
-        nik: "3171076501930001",
+        nama_lengkap: "Ivonne Bonita",
+        tanggal_lahir: "1993-03-11T00:00:00",
+        nik: "3273035103950007",
         kewarganegaraan: "ID",
-        email: "nezsya.rpay@gmail.com",
-        pekerjaan: "Staff Legal &#38; Compliance",
+        email: "ivonne.bonita@yourpay.co.id",
+        pekerjaan: "Staff Risk, Legal &#38; Compliance",
         jenis_kelamin: "F",
-        title: "Sarjana Hukum",
+        title: "Master Manajemen",
         residence: "ID"
     }
     // const [user, setUser] = useState({
@@ -86,6 +87,7 @@ function Home() {
     const arrayCompare = ( array1, array2 ) => {
         for (let index = 0; index < array1.length; index++) {
             if ( array1[index].toLowerCase() !== array2[index + 1].toLowerCase() ) {
+                // console.log(array2[index + 1]);
                 // return setError({
                 //     ...error, isError: true, errorMessage: `Invalid column format, make sure the sequence is as same as this structure : ${structureColumn.toString()}`
                 // })
@@ -102,8 +104,8 @@ function Home() {
         
         if (data.excelFile) {
             const result = await workbook.xlsx.load(data.excelFile)
-            console.log(result)
-            console.log(result._worksheets) 
+            // console.log(result)
+            // console.log(result._worksheets) 
             setWorkSheets({
                 ...workSheets, sheetData: result._worksheets
             })
@@ -358,7 +360,7 @@ function Home() {
         obj.transactionnumber = data[1]
         obj.internal_ref_number = data[2]
         obj.transaction_location = ""
-        obj.transaction_description = data[16]
+        obj.transaction_description = replaceStrAnd(data[16])
         obj.date_transaction = convertDate(data[4])
         obj.transmode_code = transmodeCode
         obj.amount_local = parseFloat(data[12]).toFixed(2)
@@ -371,30 +373,33 @@ function Home() {
         obj.t_from.from_account.branch = "-"
         obj.t_from.from_account.account = fromAccAccount
         obj.t_from.from_account.account_name = fromAccInstitutionName
+        obj.t_from.from_account.signatory = {}
+        obj.t_from.from_account.signatory.t_person = {}
+        obj.t_from.from_account.signatory.t_person.last_name = "SINAR DIGITAL TERDEPAN"
         obj.t_from.from_country = data[21]
         obj.t_to = {}
         obj.t_to.to_funds_code = toFundsCode
-        obj.t_to.to_account = {}
-        obj.t_to.to_account.institution_name = data[17]
-        // obj.t_to.to_account.swift = data[20]
-        // obj.t_to.to_account.swift = data[18]
-        obj.t_to.to_account.swift = getSwiftCode(data)
-        obj.t_to.to_account.non_bank_institution = (data[17] === "OVO" || data[17] === "GoPay") ? 1 : 0
-        obj.t_to.to_account.branch = "-"
-        obj.t_to.to_account.account = data[19]
-        obj.t_to.to_account.currency_code = "IDR"
-        // obj.t_to.to_account.account_name = data[18]
-        obj.t_to.to_account.account_name = data[20]
-        obj.t_to.to_account.iban = ""
-        obj.t_to.to_account.client_number = data[19]
-        obj.t_to.to_account.personal_account_type = "TPE"
-        obj.t_to.to_account.signatory = {}
-        obj.t_to.to_account.signatory.t_person = {}
-        // obj.t_to.to_account.signatory.t_person.last_name = data[18]
-        obj.t_to.to_account.signatory.t_person.last_name = data[20]
+        // obj.t_to.to_account = {}
+        obj.t_to.to_entity = {}
+        obj.t_to.to_entity.name = data[20]
+        // obj.t_to.to_entity.commercial_name = data[18]
+        // obj.t_to.to_account.institution_name = data[17]
+        // obj.t_to.to_account.swift = getSwiftCode(data)
+        // obj.t_to.to_account.non_bank_institution = (data[17] === "OVO" || data[17] === "GoPay") ? 1 : 0
+        // obj.t_to.to_account.branch = "-"
+        // obj.t_to.to_account.account = data[19]
+        // obj.t_to.to_account.currency_code = "IDR"
+        // obj.t_to.to_account.account_name = data[20]
+        // obj.t_to.to_account.iban = ""
+        // obj.t_to.to_account.client_number = data[19]
+        // obj.t_to.to_account.personal_account_type = "TPE"
+        // obj.t_to.to_account.signatory = {}
+        // obj.t_to.to_account.signatory.t_person = {}
+        // obj.t_to.to_account.signatory.t_person.last_name = data[20]
         obj.t_to.to_country = trsToCountry
 
         return obj
+        // buat perusahaan uncomment to_entity
     }
 
     const convertDate = (input_date = String) => {
@@ -404,6 +409,12 @@ function Home() {
         }
 
         return date
+    }
+
+    const replaceStrAnd = (str) => {
+        if (!str) return "";
+        const strFinal = str.replace("&", "&#38;");
+        return strFinal;
     }
 
     const onClickSheetName = (e) => {
