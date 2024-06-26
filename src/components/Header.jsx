@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown,
-    MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBIcon
+    MDBIcon
 } from 'mdbreact';
 import { FaUserCircle } from 'react-icons/fa'
 
@@ -27,13 +27,13 @@ class Headers extends Component {
                          <MDBNavItem active>
                              <MDBNavLink to="/">Home</MDBNavLink>
                          </MDBNavItem>
-                         <MDBNavItem>
+                         {/* <MDBNavItem>
                              <MDBNavLink to="/jsontohash">Geojson To Geohash</MDBNavLink>
                          </MDBNavItem>
                          <MDBNavItem>
                              <MDBNavLink to="#!">Pricing</MDBNavLink>
-                         </MDBNavItem>
-                         <MDBNavItem>
+                         </MDBNavItem> */}
+                         {/* <MDBNavItem>
                              <MDBDropdown>
                                  <MDBDropdownToggle nav caret>
                                      <div className="d-none d-md-inline">Dropdown</div>
@@ -45,7 +45,7 @@ class Headers extends Component {
                                      <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
                                  </MDBDropdownMenu>
                              </MDBDropdown>
-                         </MDBNavItem>
+                         </MDBNavItem> */}
                      </MDBNavbarNav>
                      <MDBNavbarNav right>
                          <MDBNavItem>
@@ -56,17 +56,8 @@ class Headers extends Component {
                          <MDBNavItem>
                              <MDBDropdown>
                                 <MDBNavLink className="waves-effect waves-light" to="#!">
-                                    {/* <MDBIcon fab icon="twitter" /> */}
                                     <FaUserCircle size="25px" />
                                 </MDBNavLink>
-                                 {/* <MDBDropdownToggle nav>
-                                 </MDBDropdownToggle>
-                                 <MDBDropdownMenu className="dropdown-default">
-                                     <MDBDropdownItem href="#!">Action</MDBDropdownItem>
-                                     <MDBDropdownItem href="#!">Another Action</MDBDropdownItem>
-                                     <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-                                     <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-                                 </MDBDropdownMenu> */}
                              </MDBDropdown>
                          </MDBNavItem>
                      </MDBNavbarNav>
@@ -75,76 +66,5 @@ class Headers extends Component {
         )
     }
 }
-
-//  function Header() {
-
-    //  const [isOpen, setisOpen] = useState(false)
-
-//     const toggleCollapse = () => {
-//         setisOpen(!isOpen)
-//     }
-
-//     return(
-//         <div>
-//             <MDBNavbar color="default-color" dark expand="md">
-//                 <MDBNavbarBrand>
-//                     <strong className="white-text">Navbar</strong>
-//                 </MDBNavbarBrand>
-//                 <MDBNavbarToggler onClick={toggleCollapse} />
-//                 <MDBCollapse id="navbarCollapse3" isOpen={isOpen} navbar>
-//                     <MDBNavbarNav left>
-//                         <MDBNavItem active>
-//                             <MDBNavLink to="/">Home</MDBNavLink>
-//                         </MDBNavItem>
-//                         <MDBNavItem>
-//                             <MDBNavLink to="/jsontohash">Geojson To Geohash</MDBNavLink>
-//                         </MDBNavItem>
-//                         <MDBNavItem>
-//                             <MDBNavLink to="#!">Pricing</MDBNavLink>
-//                         </MDBNavItem>
-//                         <MDBNavItem>
-//                             <MDBDropdown>
-//                                 <MDBDropdownToggle nav caret>
-//                                     <div className="d-none d-md-inline">Dropdown</div>
-//                                 </MDBDropdownToggle>
-//                                 <MDBDropdownMenu className="dropdown-default">
-//                                     <MDBDropdownItem href="#!">Action</MDBDropdownItem>
-//                                     <MDBDropdownItem href="#!">Another Action</MDBDropdownItem>
-//                                     <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-//                                     <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-//                                 </MDBDropdownMenu>
-//                             </MDBDropdown>
-//                         </MDBNavItem>
-//                     </MDBNavbarNav>
-//                     <MDBNavbarNav right>
-//                         <MDBNavItem>
-//                             <MDBNavLink className="waves-effect waves-light" to="#!">
-//                                 <MDBIcon fab icon="twitter" />
-//                             </MDBNavLink>
-//                         </MDBNavItem>
-//                         <MDBNavItem>
-//                             <MDBNavLink className="waves-effect waves-light" to="#!">
-//                                 <MDBIcon fab icon="google-plus-g" />
-//                             </MDBNavLink>
-//                         </MDBNavItem>
-//                         <MDBNavItem>
-//                             <MDBDropdown>
-//                                 <MDBDropdownToggle nav caret>
-//                                     <MDBIcon icon="user" />
-//                                 </MDBDropdownToggle>
-//                                 <MDBDropdownMenu className="dropdown-default">
-//                                     <MDBDropdownItem href="#!">Action</MDBDropdownItem>
-//                                     <MDBDropdownItem href="#!">Another Action</MDBDropdownItem>
-//                                     <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-//                                     <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-//                                 </MDBDropdownMenu>
-//                             </MDBDropdown>
-//                         </MDBNavItem>
-//                     </MDBNavbarNav>
-//                 </MDBCollapse>
-//             </MDBNavbar>
-//         </div>
-//     )
-// }
 
 export default Headers
