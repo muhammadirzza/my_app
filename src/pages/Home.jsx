@@ -9,15 +9,18 @@ function Home() {
         transmodeCode: "TRM",
         reportCode: "TKLIP",
         fromFundsCode: "REK",
-        toFundsCode: "UE",
+
+        // toFundsCode: "UE",
         // toFundsCode: "TRVEN",
-        // toFundsCode: "REK",
+        toFundsCode: "REK",
+
         personalAccountType: "TPE",
         trsToCountry: "ID",
         fromAccSwift: "CENAIDJAXXX",
         fromAccAccount: "0703074003",
         fromAccInstitutionName: "PT. Sinar Digital Terdepan",
-        rentityId: 3846,
+        //rentityId: 3846,
+        rentityId: 36624,
         rentityBranch: "PT Rpay Finansial Digital Indonesia",
         rowData: undefined,
         rowDataCount:0,
@@ -45,29 +48,43 @@ function Home() {
     //     title: "Sarjana Hukum",
     //     residence: "ID"
     // })
+    // const structureColumn = [
+    //     "Transaction ID",
+    //     "External ID",
+    //     "Transaction Type",
+    //     "Date & Time",
+    //     "Sender Mobile",
+    //     "Sender Name",
+    //     "Sender Grade",
+    //     "Sender Amount",
+    //     "Receiver Mobile",
+    //     "Receiver Name",
+    //     "Receiver Grade",
+    //     "Receiver Amount",
+    //     "Service Charge",
+    //     "Commission",
+    //     "Status",
+    //     "Message",
+    //     "Destination Bank",
+    //     "SWIFT CODE",
+    //     "Destination Bank Account",
+    //     "Destination Person",
+    //     "From Country"
+    // ]
+
     const structureColumn = [
-        "Transaction ID",
-        "External ID",
-        "Transaction Type",
-        "Date & Time",
-        "Sender Mobile",
-        "Sender Name",
-        "Sender Grade",
-        "Sender Amount",
-        "Receiver Mobile",
-        "Receiver Name",
-        "Receiver Grade",
-        "Receiver Amount",
-        "Service Charge",
-        "Commission",
-        "Status",
-        "Message",
-        "Destination Bank",
-        "SWIFT CODE",
-        "Destination Bank Account",
-        "Destination Person",
-        "From Country"
+        "transaction_id",
+        "system_date_and_time",
+        "sender_msisdn",
+        "sender_name",
+        "destination_bank",
+        "swift_code",
+        "destination_bank_account",
+        "destination_person",
+        "sender_amount",
+        "from_country"
     ]
+
     const [error, setError] = useState({
         isError: false,
         errorMessage: ""
@@ -86,7 +103,7 @@ function Home() {
 
     const arrayCompare = ( array1, array2 ) => {
         for (let index = 0; index < array1.length; index++) {
-            if ( array1[index].toLowerCase() !== array2[index + 1].toLowerCase() ) {
+            if ( array1[index].toLowerCase().trim() !== array2[index + 1].toLowerCase().trim() ) {
                 // console.log(array2[index + 1]);
                 // return setError({
                 //     ...error, isError: true, errorMessage: `Invalid column format, make sure the sequence is as same as this structure : ${structureColumn.toString()}`
@@ -201,7 +218,7 @@ function Home() {
                 ws.eachRow({includeEmpty: true}, function (row, rowNumber) {
                     // console.log(row.values, rowNumber)
                     if (rowNumber > 3) {
-                        // console.log(`Row ${rowNumber} = ${row.values}`)
+                        console.log(`Row ${rowNumber} = ${row.values}`)
                         // transactionsToXML(row.values)
                         // dataToSend.rentity_id = 3846
                         // dataToSend.rentity_branch = "PT Rpay Finansial Digital Indonesia"
@@ -265,7 +282,7 @@ function Home() {
                         // // dataToSend.externalId = row.values[2]
                         // report.push(dataToSend)
                         // dataToSend = {}
-                        transaction.push(transactionsToXML(row.values))
+                        transaction.push(transactionsToXML(row.values, rowNumber))
                         setReportingData({
                             ...reportingData, rowDataCount: ++reportingData.rowDataCount
                         })
@@ -347,55 +364,95 @@ function Home() {
     }
 
     const getSwiftCode = (input) => {
-        if (input[17] === 'OVO') return 'NOBUIDJA';
-        if (input[17] === 'GoPay') return 'GOJKIDJA';
-        return input[18];
+        if (input[5] === 'OVO') return 'NOBUIDJA';
+        if (input[5] === 'GoPay') return 'GOJKIDJA';
+        return input[6];
+        // if (input[17] === 'OVO') return 'NOBUIDJA';
+        // if (input[17] === 'GoPay') return 'GOJKIDJA';
+        // return input[18];
     }
 
-    const transactionsToXML = (data) => {
+    const transactionsToXML = (data, rowNumber) => {
         const { fromFundsCode, toFundsCode, transmodeCode, trsToCountry, fromAccSwift, fromAccAccount, fromAccInstitutionName } = reportingData
         let obj = {}
 
         obj = {}
-        obj.transactionnumber = data[1]
-        obj.internal_ref_number = data[2]
+        obj.transactionnumber = `${rowNumber - 3}`
+        // obj.transactionnumber = data[1]
+        // obj.transactionnumber = data["Transaction ID"]
+        
+        obj.internal_ref_number = data[1]
+        // obj.internal_ref_number = data[2]
+        // obj.internal_ref_number = data["External ID"]
         obj.transaction_location = ""
-        obj.transaction_description = replaceStrAnd(data[16])
-        obj.date_transaction = convertDate(data[4])
+        obj.transaction_description = ""
+        // obj.transaction_description = replaceStrAnd(data[16])
+        // obj.transaction_description = replaceStrAnd(data["Message"])
+
+        obj.date_transaction = convertDate(data[2])
+        // obj.date_transaction = convertDate(data[4])
+        // obj.date_transaction = convertDate(data["Date & Time"])
+
         obj.transmode_code = transmodeCode
-        obj.amount_local = parseFloat(data[12]).toFixed(2)
+        obj.amount_local = parseFloat(data[9]).toFixed(2)
+        // obj.amount_local = parseFloat(data[12]).toFixed(2)
+        // obj.amount_local = parseFloat(data["Sender Amount"]).toFixed(2)
+
         obj.t_from = {}
         obj.t_from.from_funds_code = fromFundsCode
         obj.t_from.from_account = {}
-        obj.t_from.from_account.institution_name = data[10]
+        obj.t_from.from_account.institution_name = data[11]
+        // obj.t_from.from_account.institution_name = data[10]
+        // obj.t_from.from_account.institution_name = data["Receiver Name"]
+
         obj.t_from.from_account.swift = fromAccSwift
-        obj.t_from.from_account.non_bank_institution = 1
+        obj.t_from.from_account.non_bank_institution = 0 //1
         obj.t_from.from_account.branch = "-"
         obj.t_from.from_account.account = fromAccAccount
         obj.t_from.from_account.account_name = fromAccInstitutionName
         obj.t_from.from_account.signatory = {}
         obj.t_from.from_account.signatory.t_person = {}
         obj.t_from.from_account.signatory.t_person.last_name = "SINAR DIGITAL TERDEPAN"
-        obj.t_from.from_country = data[21]
+        obj.t_from.from_country = data[10]
+        // obj.t_from.from_country = data[21]
+        // obj.t_from.from_country = data["From Country"]
+
         obj.t_to = {}
         obj.t_to.to_funds_code = toFundsCode
-        // obj.t_to.to_account = {}
-        obj.t_to.to_entity = {}
-        obj.t_to.to_entity.name = data[20]
-        // obj.t_to.to_entity.commercial_name = data[18]
+        
+        obj.t_to.to_account = {}
+        obj.t_to.to_account.institution_name = data[5]  //bank name
         // obj.t_to.to_account.institution_name = data[17]
-        // obj.t_to.to_account.swift = getSwiftCode(data)
+        obj.t_to.to_account.swift = getSwiftCode(data)
+        obj.t_to.to_account.non_bank_institution = (data[5] === "OVO" || data[5] === "GoPay") ? 1 : 0
         // obj.t_to.to_account.non_bank_institution = (data[17] === "OVO" || data[17] === "GoPay") ? 1 : 0
-        // obj.t_to.to_account.branch = "-"
+        obj.t_to.to_account.branch = "-"
+        obj.t_to.to_account.account = data[7]
         // obj.t_to.to_account.account = data[19]
-        // obj.t_to.to_account.currency_code = "IDR"
+        obj.t_to.to_account.currency_code = "IDR"
+        obj.t_to.to_account.account_name = data[8]
         // obj.t_to.to_account.account_name = data[20]
-        // obj.t_to.to_account.iban = ""
+        obj.t_to.to_account.iban = ""
+        obj.t_to.to_account.client_number = data[7]
         // obj.t_to.to_account.client_number = data[19]
-        // obj.t_to.to_account.personal_account_type = "TPE"
-        // obj.t_to.to_account.signatory = {}
-        // obj.t_to.to_account.signatory.t_person = {}
+        obj.t_to.to_account.personal_account_type = "TPE"
+        obj.t_to.to_account.signatory = {}
+        obj.t_to.to_account.signatory.t_person = {}
+        obj.t_to.to_account.signatory.t_person.last_name = data[8]
         // obj.t_to.to_account.signatory.t_person.last_name = data[20]
+
+        // obj.t_to.to_account.account_name = data["Destination Person"]
+        // obj.t_to.to_account.account = data["Destination Bank Account"]
+        // obj.t_to.to_account.non_bank_institution = (data["Destination Bank"] === "OVO" || data["Destination Bank"] === "GoPay") ? 1 : 0
+        // obj.t_to.to_account.institution_name = data["Destination Bank"]
+        
+        // obj.t_to.to_entity = {}
+        // obj.t_to.to_entity.name = data[20]
+        // obj.t_to.to_entity.commercial_name = data[18]
+        // obj.t_to.to_entity.swift = getSwiftCode(data)
+        
+        // obj.t_to.to_entity.name = data["Destination Person"]
+
         obj.t_to.to_country = trsToCountry
 
         return obj
